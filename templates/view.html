@@ -1,0 +1,108 @@
+{% extends 'layout.html' %}
+{% block style %}
+<style>
+
+</style>
+{% endblock %}
+
+{% block main %}
+
+<header class="container">
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <img src="/static/ico/android-chrome-512x512.png" width="30" height="30" class="d-inline-block align-top"
+                alt="">
+            Իմ Սյունիք
+        </a>
+        <div class="form-inline">
+            <a class="btn btn-outline-success" href="#" data-toggle="modal" data-target="#add"><i
+                    class="fas fa-plus-circle" aria-hidden="true"></i> Ավելացնել</a>
+        </div>
+    </nav>
+</header>
+
+<section class="container">
+    {% if questions %}
+    {% for question in questions %}
+    <div class="card mt-3" data="{{ question.id }}">
+        <div class="card-header">
+            <h5 class="title">{{ question.question }}</h5>
+            <div class="edit"><i class="fa fa-edit update" data-toggle="modal"
+                data-target="#change"></i>&nbsp;<i class="fa fa-remove delete"></i></div>
+        </div>
+        
+        <div class="card-body">
+            <div class="row funkyradio">
+                <div class="col funkyradio-{% if question.true == '1' %}success{% else %}default{% endif %}">
+                    <input type="checkbox" checked name="radio"/>
+                    <label>{{ question.answers[0] }}</label>
+                </div>
+                <div class="col funkyradio-{% if question.true == '2' %}success {% else %}default{% endif %}">
+                    <input type="checkbox" checked name="radio"/>
+                    <label>{{ question.answers[1] }}</label>
+                </div>
+            </div>
+            <div class="row funkyradio">
+                <div class="col funkyradio-{% if question.true == '3' %}success{% else %}default{% endif %}">
+                    <input type="checkbox" checked name="radio"/>
+                    <label>{{ question.answers[2] }}</label>
+                </div>
+                <div class="col funkyradio-{% if question.true == '4' %}success{% else %}default{% endif %}">
+                    <input type="checkbox" checked name="radio"/>
+                    <label>{{ question.answers[3] }}</label>
+                </div>
+            </div>
+            <input type="text" name="answer" hidden data="{{ question.true }}">
+        </div>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <pre class="text-center">Հարցաշարը դատարկ է, կարող եք ավելացնել նոր հարցեր սեղմելով ավելացնել կոճակը!</pre>
+    {% endif %}
+</section>
+
+{% include 'add.html' %}
+{% include 'update.html' %}
+
+{% endblock %}
+
+
+
+<!-- <div class="card">
+        <div class="card-header">
+            <h4>Your Answer</h4>
+        </div>
+        <div class="card-body">
+            <div class="row funkyradio">
+                <div class="col funkyradio-success">
+                    <input type="radio" name="radio" id="radio3" />
+                    <label for="radio3">Third Option success</label>
+                </div>
+                <div class="col funkyradio-danger">
+                    <input type="radio" name="radio" id="radio4" />
+                    <label for="radio4">Fourth Option danger</label>
+                </div>
+            </div>
+            <div class="row funkyradio">
+                <div class="col funkyradio-default">
+                    <input type="radio" name="radio" id="radio1" />
+                    <label for="radio1">First Option default</label>
+                </div>
+                <div class="col funkyradio-primary">
+                    <input type="radio" name="radio" id="radio2" checked />
+                    <label for="radio2">Second Option primary</label>
+                </div>
+            </div>
+            <div class="row funkyradio">
+                <div class="col funkyradio-warning">
+                    <input type="radio" name="radio" id="radio5" />
+                    <label for="radio5">Fifth Option warning</label>
+                </div>
+                <div class="col funkyradio-info">
+                    <input type="radio" name="radio" id="radio6" />
+                    <label for="radio6">Sixth Option info</label>
+                </div>
+            </div>
+        </div>
+    </div> -->

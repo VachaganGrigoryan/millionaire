@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}Home page{% endblock %}
+
+
+{% block content %}
+    <header class="p-3 bg-dark text-white">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <a href="{% url 'home' %}"
+                   class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                    <img class="mb-4" src="{% static 'images/logo.png' %}" alt="" width="40" height="32">
+                </a>
+
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center ml-2">
+                    <li><h2>Բարի գալուստ, {{ user.get_full_name }} </h2></li>
+                </ul>
+
+                <div class="text-end">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'logout' %}" class="btn btn-outline-light me-2">Ելք</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Մուտք</a>
+                        <a href="{% url 'signup' %}" class="btn btn-warning">Գրանցվել</a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="wrapper">
+                        <h2>Ո՞վ է ուզում դառնալ միլոնատեր!</h2>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-copyright text-center py-3">© Պատրաստվել է «Վաչագան Գրիգորյան»֊ի կողմից</div>
+    </footer>
+
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    {% if session.user_id %}
+
+        <script>
+            $(document).ready(function () {
+                $.ajax({
+                    type: "GET",
+                    url: `/render`
+                }).done(function (data) {
+                    console.log(data);
+                    $('nav').append(`<div class="form-inline"><a class="btn btn-outline-danger" href="/reload"><i class="fas fa-redo"></i> </a></div>`).fadeIn();
+                    if ("answers" in data) {
+                        $('section').append(`<div class="loader"></div>`).fadeIn();
+                        setTimeout(function () {
+                            $(".loader").fadeOut();
+                            renderAnswer(data);
+                        }, 3500);
+
+                    } else {
+                        // renderQuestion(data);
+
+                        $('section').append(`<div class="loader"></div>`).fadeIn();
+                        setTimeout(function () {
+                            $(".loader").fadeOut();
+                            renderQuestion(data);
+                        }, 600);
+                    }
+
+                }).fail(function (err) {
+                    console.log(err);
+                });
+            });
+        </script>
+    {% endif %}
+
+{% endblock %}
