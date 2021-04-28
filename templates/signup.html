@@ -1,27 +1,29 @@
 {% extends 'layout.html' %}
+{% load static %}
 
 {% block content %}
 
-<div class="login">
-<main class="form-signin text-center">
-  <h2>Գրանցում</h2>
-  <form method="post">
-    {% csrf_token %}
-    {% for field in form %}
-      <p>
-        {{ field.label_tag }}<br>
-        {{ field }}
-{#        {% if field.help_text %}#}
-{#          <small style="color: grey">{{ field.help_text }}</small>#}
-{#        {% endif %}#}
-        {% for error in field.errors %}
-          <p style="color: red">{{ error }}</p>
-        {% endfor %}
-      </p>
-    {% endfor %}
-   <button class="w-100 btn btn-lg btn-success" type="submit">Գրանցվել</button>
-      <a href="{% url 'login' %}">Դեռ չունե՞ք! Գրանցվել</a>
-  </form>
-</main>
-</div>
+    <div class="signin">
+        <main class="form-signin text-center">
+            <img class="mb-4" src="{% static 'images/logo.png' %}" alt="" width="72" height="57">
+            <h1 class="h3 mb-3 fw-normal">Դարձիր միլոնատեր</h1>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <p>
+                        {{ field.label_tag }}<br>
+                        {{ field }}
+                        {#        {% if field.help_text %}#}
+                        {#          <small style="color: grey">{{ field.help_text }}</small>#}
+                        {#        {% endif %}#}
+                        {% for error in field.errors %}
+                            <p style="color: red">{{ error }}</p>
+                        {% endfor %}
+                    </p>
+                {% endfor %}
+                <button class="w-100 btn btn-lg btn-success" type="submit">Գրանցվել</button>
+                <a href="{% url 'login' %}">Ունեք հաշիվ! Մուտք</a>
+            </form>
+        </main>
+    </div>
 {% endblock %}

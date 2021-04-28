@@ -3,7 +3,7 @@ body {
   height: 100%;
 }
 
-div.login {
+div.login, div.signin {
   display: flex;
   align-items: center;
   padding-top: 40px;
