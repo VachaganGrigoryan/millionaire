@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="quiz">
+        <main class="form-quiz">
+            <div class="container">
+            <h6>Game - <i>{{ quiz.title }}</i></h6>
+            <form action="{% url 'answer' title=quiz.title %}" method="post" class="row">
+                {% csrf_token %}
+                <h3 class="title">{{ question.content }}</h3>
+                <input type="text" hidden name="question" value="{{ question.id }}">
+                {% for option in question.options.all %}
+
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer" value="{{ option.body }}" id="radio_{{ forloop.counter }}">
+                        <label class="form-check-label" for="radio_{{ forloop.counter }}">
+                            {{ option.body }}
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+
+            <div class="col-12 my-2">
+                <button class="btn btn-outline-primary" id="answer">Պատասխանել</button>
+            </div>
+            </form>
+            </div>
+        </main>
+    </div>
+{% endblock %}

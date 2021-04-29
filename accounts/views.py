@@ -1,13 +1,23 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
+from django.template import loader
+from django.http import HttpResponse
 
+from quiz.models import Quiz
 from .forms import SignUpForm
+
+
+def handle_404(request, exception=None):
+    template = loader.get_template('404.html')
+    return HttpResponse(template.render({}, request), status=404)
 
 
 @login_required(login_url='/login')
 def home(request):
-    return render(request, 'index.html')
+    quizzes = Quiz.objects.order_by('total')[:10]
+
+    return render(request, 'index.html', {'quizzes': quizzes})
 
 
 def signup(request):
@@ -25,4 +35,4 @@ def signup(request):
             return redirect('home')
     else:
         form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'accounts/signup.html', {'form': form})

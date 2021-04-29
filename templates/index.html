@@ -31,7 +31,7 @@
     </header>
 
     <section>
-        <div class="container">
+        <div class="container my-3">
             <div class="row">
                 <div class="col">
                     <div class="wrapper">
@@ -39,12 +39,46 @@
 
                     </div>
                 </div>
+                <div class="col">
+                    <a href="{% url 'new-game' %}" class="btn btn-warning">Խաղալ</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Անուն Ազգանուն</th>
+                            <th scope="col">Էլ․ հասցե</th>
+                            <th scope="col">Միավոր</th>
+                            <th scope="col">Կարգավիճակ</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for quiz in quizzes%}
+                        <tr>
+                            <th scope="row"><a href="#">{{ quiz.title }}</a></th>
+                            <th>{{ quiz.user.get_full_name }}</th>
+                            <td>{{ quiz.user.email }}</td>
+                            <td>{{ quiz.total }}</td>
+                            <td>{{ quiz.status }}</td>
+                        </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </section>
 
-    <footer>
-        <div class="footer-copyright text-center py-3">© Պատրաստվել է «Վաչագան Գրիգորյան»֊ի կողմից</div>
+
+    <footer class="footer mt-auto py-1 bg-light">
+        <div class="container">
+            <div class="footer-copyright text-center py-2"><span class="text-muted">© Պատրաստվել է «Վաչագան Գրիգորյան»֊ի կողմից.</span>
+            </div>
+        </div>
     </footer>
 
     </div>

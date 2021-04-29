@@ -6,7 +6,7 @@ from .models import Quiz, Question, Option, Answer
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ['title', 'user', 'created_at']
+    list_display = ['title', 'user', 'status', 'created_at']
     search_fields = ['title']
 
 
