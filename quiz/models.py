@@ -2,6 +2,21 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Answer(models.Model):
+    id = models.AutoField(primary_key=True)
+    quiz = models.ForeignKey('Quiz', on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, related_name='question')
+    selected = models.ForeignKey('Option', on_delete=models.CASCADE, related_name='selected')
+
+    class Meta:
+        verbose_name_plural = "Quiz Answers"
+        unique_together = ['quiz', 'question']
+        ordering = ['id']
+
+    def __str__(self):
+        return self.selected.body
+
+
 class Quiz(models.Model):
     class QuizStatus(models.TextChoices):
         in_progress = 'Ընթացքի մեջ'
@@ -24,9 +39,21 @@ class Quiz(models.Model):
         return self.title
 
     def election(self, question_id, answer):
-        question = self.questions.get(id=56).exists()
-        print(question)
-        # question.check_answer(answer)
+        quiz_answer = None
+        question = self.questions.all().filter(id=question_id).first()
+        if question:
+            option = question.check_answer(answer)
+            if option:
+                quiz_answer = Answer.objects.create(
+                    quiz=self,
+                    question=question,
+                    selected=option
+                )
+
+        return quiz_answer
+
+    def is_answered_question(self, question_id):
+        return self.answers.all().filter(question_id=question_id).first()
 
 
 class Question(models.Model):
@@ -38,8 +65,9 @@ class Question(models.Model):
         verbose_name_plural = "Questions"
         ordering = ['id']
 
-    def check_answer(self, option):
-        print(self.options.all())
+    def check_answer(self, option_body):
+        option = self.options.all().filter(body=option_body).first()
+        return option
 
     def __repr__(self):
         return f"Question('{self.id}', '{self.content}')"
@@ -61,17 +89,3 @@ class Option(models.Model):
     def __str__(self):
         return self.body
 
-
-class Answer(models.Model):
-    id = models.AutoField(primary_key=True)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='answers')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='question')
-    selected = models.ForeignKey(Option, on_delete=models.CASCADE, related_name='selected')
-
-    class Meta:
-        verbose_name_plural = "Quiz Answers"
-        unique_together = ['quiz', 'question']
-        ordering = ['id']
-
-    def __str__(self):
-        return self.selected.body

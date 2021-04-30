@@ -40,10 +40,14 @@ def game(request, title):
     if quiz is None:
         return redirect('/')
 
+    question = quiz.questions.first()
+    answer = quiz.is_answered_question(question_id=question.id)
+
     template = loader.get_template('quiz/quiz.html')
     context = {
         'quiz': quiz,
-        'question': quiz.questions.first()
+        'question': question,
+        'answer': answer
     }
 
     return HttpResponse(template.render(context, request))
@@ -65,7 +69,15 @@ def answer(request, title):
             questions__id=question_id
         ).first()
 
-        if quiz:
-            quiz.election(question_id, answer)
+        if quiz and not quiz.is_answered_question(question_id):
+            quiz_answer = quiz.election(question_id, answer)
+            if quiz_answer:
+                template = loader.get_template('quiz/quiz.html')
+                context = {
+                    'quiz': quiz_answer.quiz,
+                    'question': quiz_answer.question,
+                    'answer': quiz_answer.selected
+                }
+                return HttpResponseRedirect(f'/millionaire/game/{title}', content=template.render(context, request))
 
     return redirect('game', title=title)
