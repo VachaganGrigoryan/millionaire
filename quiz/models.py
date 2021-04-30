@@ -39,21 +39,31 @@ class Quiz(models.Model):
         return self.title
 
     def election(self, question_id, answer):
-        quiz_answer = None
-        question = self.questions.all().filter(id=question_id).first()
-        if question:
-            option = question.check_answer(answer)
-            if option:
-                quiz_answer = Answer.objects.create(
-                    quiz=self,
-                    question=question,
-                    selected=option
-                )
-
+        question = self.questions.get(id=question_id)
+        option = question.get_option(answer)
+        quiz_answer = Answer.objects.create(
+            quiz=self,
+            question=question,
+            selected=option
+        )
+        if option.correct:
+            self.total += question.coin
+            self.save()
         return quiz_answer
 
+    def set_status(self, status):
+        self.status = status
+        self.save()
+
+    def set_questions(self, questions):
+        self.questions.set(questions)
+        self.save()
+
+    def get_next_question(self):
+        return self.questions.all().filter(~models.Q(id__in=self.answers.values('question'))).first()
+
     def is_answered_question(self, question_id):
-        return self.answers.all().filter(question_id=question_id).first()
+        return self.answers.all().filter(question__id=question_id).first()
 
 
 class Question(models.Model):
@@ -65,9 +75,8 @@ class Question(models.Model):
         verbose_name_plural = "Questions"
         ordering = ['id']
 
-    def check_answer(self, option_body):
-        option = self.options.all().filter(body=option_body).first()
-        return option
+    def get_option(self, answer):
+        return self.options.all().filter(body=answer).first()
 
     def __repr__(self):
         return f"Question('{self.id}', '{self.content}')"

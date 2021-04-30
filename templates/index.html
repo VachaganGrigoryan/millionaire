@@ -33,46 +33,65 @@
     <section>
         <div class="container my-3">
             <div class="row">
+                {% if message %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>Ուշադրություն!</strong> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
                 <div class="col">
                     <div class="wrapper">
                         <h2>Ո՞վ է ուզում դառնալ միլոնատեր!</h2>
-
                     </div>
                 </div>
-                <div class="col">
+                <div class="col text-center">
                     <a href="{% url 'new-game' %}" class="btn btn-warning">Խաղալ</a>
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Անուն Ազգանուն</th>
-                            <th scope="col">Էլ․ հասցե</th>
-                            <th scope="col">Միավոր</th>
-                            <th scope="col">Կարգավիճակ</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for quiz in quizzes%}
-                        <tr>
-                            <th scope="row"><a href="#">{{ quiz.title }}</a></th>
-                            <th>{{ quiz.user.get_full_name }}</th>
-                            <td>{{ quiz.user.email }}</td>
-                            <td>{{ quiz.total }}</td>
-                            <td>{{ quiz.status }}</td>
-                        </tr>
-                        {% endfor %}
-
-                        </tbody>
-                    </table>
+            {% if quizzes %}
+                <div class="row mt-5">
+                    <div class="col">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th>Անուն Ազգանուն</th>
+                                <th>Էլ․ հասցե</th>
+                                <th>Միավոր</th>
+                                <th>Կարգավիճակ</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for quiz in quizzes %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <th>{{ quiz.user.get_full_name }}</th>
+                                    <td>{{ quiz.user.email }}</td>
+                                    <td>{{ quiz.total }}</td>
+                                    <td>{{ quiz.status }}</td>
+                                    <td>
+                                        {% if request.user == quiz.user %}
+                                            {% if quiz.status == quiz.QuizStatus.in_progress %}
+                                                <a href="{% url 'game' title=quiz.title %}"
+                                                   class="btn btn-outline-primary">Շարունակել</a>
+                                            {% else %}
+                                                <a href="{% url 'score' title=quiz.title %}"
+                                                   class="btn btn-outline-primary">Դիտել արդյունքը</a>
+                                            {% endif %}
+                                        {% else %}
+                                            <a href="#" class="btn btn-outline-secondary disabled">Դիտել արդյունքը</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </section>
-
 
     <footer class="footer mt-auto py-1 bg-light">
         <div class="container">
@@ -80,44 +99,5 @@
             </div>
         </div>
     </footer>
-
-    </div>
-
-{% endblock %}
-
-{% block script %}
-    {% if session.user_id %}
-
-        <script>
-            $(document).ready(function () {
-                $.ajax({
-                    type: "GET",
-                    url: `/render`
-                }).done(function (data) {
-                    console.log(data);
-                    $('nav').append(`<div class="form-inline"><a class="btn btn-outline-danger" href="/reload"><i class="fas fa-redo"></i> </a></div>`).fadeIn();
-                    if ("answers" in data) {
-                        $('section').append(`<div class="loader"></div>`).fadeIn();
-                        setTimeout(function () {
-                            $(".loader").fadeOut();
-                            renderAnswer(data);
-                        }, 3500);
-
-                    } else {
-                        // renderQuestion(data);
-
-                        $('section').append(`<div class="loader"></div>`).fadeIn();
-                        setTimeout(function () {
-                            $(".loader").fadeOut();
-                            renderQuestion(data);
-                        }, 600);
-                    }
-
-                }).fail(function (err) {
-                    console.log(err);
-                });
-            });
-        </script>
-    {% endif %}
 
 {% endblock %}

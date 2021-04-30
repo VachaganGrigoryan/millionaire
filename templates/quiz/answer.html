@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="quiz">
+        <main class="form-quiz">
+            <div class="container">
+                <div class="row my-3">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header text-center">
+                                <span class="badge rounded-pill bg-info"><i>{{ answer.quiz.title }}</i></span>
+                                <a href="{% url 'home' %}" class="btn btn-outline-warning mx-2">Ելք</a>
+                                <a href="{% url 'close' title=answer.quiz.title %}"
+                                   class="btn btn-outline-danger mx-2">Փակել</a>
+                            </div>
+                            <div class="card-body row">
+                                <h4 class="card-title">{{ answer.question.content }}</h4>
+                                {% for option in answer.question.options.all %}
+                                    <div class="col-6">
+                                        {% if option.correct %}
+                                            <span class="badge bg-success"> {{ option.body }} </span>
+                                        {% else %}
+                                            <span class="badge bg-{% if option == answer.selected %}warning text-dark{% else %}danger{% endif %}">{{ option.body }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+
+                                <div class="col-12 mt-4 text-center">
+                                    <a href="{% url 'game' title=answer.quiz.title %}"
+                                       class="btn btn-outline-primary">Հաջորդը</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+{% endblock %}

@@ -15,7 +15,7 @@ def handle_404(request, exception=None):
 
 @login_required(login_url='/login')
 def home(request):
-    quizzes = Quiz.objects.order_by('total')[:10]
+    quizzes = Quiz.objects.order_by('-total')[:10]
 
     return render(request, 'index.html', {'quizzes': quizzes})
 

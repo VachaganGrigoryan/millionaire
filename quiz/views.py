@@ -2,8 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.template import loader
+from django.db.models import Q
+
 
 from random import sample
 from uuid import uuid4
@@ -18,36 +21,40 @@ def new_game(request):
         return redirect('game', title=quiz.title)
 
     questions = Question.objects.all()
-    random_questions = sample(list(questions), k=5)
+    try:
+        random_questions = sample(list(questions), k=5)
+    except ValueError:
+        template = loader.get_template('index.html')
+        context = {
+            'message': 'Անբավարար հարցեր!',
+            'quizzes': quiz
+        }
+        return HttpResponse(template.render(context, request))
 
     new_quiz = Quiz.objects.create(user=request.user, title=str(uuid4()).upper())
-    new_quiz.questions.set(random_questions)
-    new_quiz.save()
+    new_quiz.set_questions(random_questions)
 
-    template = loader.get_template('quiz/quiz.html')
-    context = {
-        'quiz': new_quiz,
-        'question': new_quiz.questions.first()
-    }
-
-    return HttpResponseRedirect(f'/millionaire/game/{new_quiz.title}', content=template.render(context, request))
+    return HttpResponseRedirect(f'/millionaire/game/{new_quiz.title}')
 
 
 @login_required(login_url='/login')
 def game(request, title):
-    quiz = Quiz.objects.filter(user=request.user, title=title, status=Quiz.QuizStatus.in_progress).first()
+    quiz = get_object_or_404(
+        Quiz,
+        user=request.user,
+        title=title,
+        status=Quiz.QuizStatus.in_progress
+    )
+    question = quiz.get_next_question()
 
-    if quiz is None:
-        return redirect('/')
-
-    question = quiz.questions.first()
-    answer = quiz.is_answered_question(question_id=question.id)
+    if question is None:
+        quiz.set_status(Quiz.QuizStatus.done)
+        return redirect('score', title=title)
 
     template = loader.get_template('quiz/quiz.html')
     context = {
         'quiz': quiz,
-        'question': question,
-        'answer': answer
+        'question': question
     }
 
     return HttpResponse(template.render(context, request))
@@ -56,28 +63,53 @@ def game(request, title):
 @login_required(login_url='/login')
 def answer(request, title):
     if request.method != 'POST':
-        return redirect('/')
+        return redirect('game', title=title)
 
     question_id = request.POST.get('question')
     answer = request.POST.get('answer')
 
-    if question_id and answer:
-        quiz = Quiz.objects.filter(
-            user=request.user,
-            title=title,
-            status=Quiz.QuizStatus.in_progress,
-            questions__id=question_id
-        ).first()
+    if not question_id or not answer:
+        return redirect('game', title=title)
 
-        if quiz and not quiz.is_answered_question(question_id):
-            quiz_answer = quiz.election(question_id, answer)
-            if quiz_answer:
-                template = loader.get_template('quiz/quiz.html')
-                context = {
-                    'quiz': quiz_answer.quiz,
-                    'question': quiz_answer.question,
-                    'answer': quiz_answer.selected
-                }
-                return HttpResponseRedirect(f'/millionaire/game/{title}', content=template.render(context, request))
+    quiz = get_object_or_404(
+        Quiz,
+        user=request.user,
+        title=title,
+        questions__id=question_id,
+        questions__options__body=answer
+    )
 
-    return redirect('game', title=title)
+    if quiz.is_answered_question(question_id):
+        quiz_answer = quiz.answers.get(question__id=question_id)
+    else:
+        quiz_answer = quiz.election(question_id, answer)
+
+    template = loader.get_template('quiz/answer.html')
+    context = {
+        'answer': quiz_answer
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def score(request, title):
+    quiz = get_object_or_404(
+        Quiz,
+        user=request.user,
+        title=title,
+        status__in=(Quiz.QuizStatus.done, Quiz.QuizStatus.closed)
+    )
+    template = loader.get_template('quiz/score.html')
+    context = {
+        'quiz': quiz
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def close(request, title):
+    quiz = get_object_or_404(
+        Quiz,
+        user=request.user,
+        title=title
+    )
+    quiz.set_status(Quiz.QuizStatus.closed)
+    return redirect('home')
