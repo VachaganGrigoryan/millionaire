@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% block title %}֊ Պատասխան{% endblock %}
+
 {% block content %}
     <div class="quiz">
         <main class="form-quiz">
@@ -9,6 +11,7 @@
                         <div class="card">
                             <div class="card-header text-center">
                                 <span class="badge rounded-pill bg-info"><i>{{ answer.quiz.title }}</i></span>
+                                <span class="badge rounded-pill bg-primary">{{ answer.question.coin }}</span>
                                 <a href="{% url 'home' %}" class="btn btn-outline-warning mx-2">Ելք</a>
                                 <a href="{% url 'close' title=answer.quiz.title %}"
                                    class="btn btn-outline-danger mx-2">Փակել</a>
@@ -26,8 +29,9 @@
                                 {% endfor %}
 
                                 <div class="col-12 mt-4 text-center">
-                                    <a href="{% url 'game' title=answer.quiz.title %}"
-                                       class="btn btn-outline-primary">Հաջորդը</a>
+                                    <a href="{% url 'game' title=answer.quiz.title %}" class="btn btn-outline-primary">
+                                        {% if answer.quiz.get_next_question %}Հաջորդը{% else %}Արդյունքը{% endif %}
+                                    </a>
                                 </div>
                             </div>
                         </div>

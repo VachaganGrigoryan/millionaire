@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class Answer(models.Model):
@@ -41,6 +41,11 @@ class Quiz(models.Model):
     def election(self, question_id, answer):
         question = self.questions.get(id=question_id)
         option = question.get_option(answer)
+
+        quiz_answer = self.is_answered_question(question_id)
+        if quiz_answer:
+            return quiz_answer
+
         quiz_answer = Answer.objects.create(
             quiz=self,
             question=question,
@@ -97,4 +102,3 @@ class Option(models.Model):
 
     def __str__(self):
         return self.body
-

@@ -6,8 +6,9 @@ from .models import Quiz, Question, Option, Answer
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ['title', 'user', 'status', 'created_at']
+    list_display = ['id', 'title', 'user', 'status', 'total', 'created_at']
     search_fields = ['title']
+    list_display_links = ('title',)
 
 
 class QuizQuestionsFilter(admin.SimpleListFilter):
@@ -30,6 +31,8 @@ class QuizQuestionsFilter(admin.SimpleListFilter):
 
 class OptionInlineAdmin(admin.TabularInline):
     model = Option
+    extra = 0
+    min_num = 2
 
 
 @admin.register(Question)
@@ -39,6 +42,7 @@ class QuestionAdmin(admin.ModelAdmin):
         'coin',
     ]
     list_display = ['id', 'content', 'coin']
+    list_display_links = ('content',)
     inlines = [OptionInlineAdmin, ]
     list_filter = [QuizQuestionsFilter, ]
     search_fields = ['content']
@@ -63,8 +67,9 @@ class QuestionOptionsFilter(admin.SimpleListFilter):
 
 @admin.register(Option)
 class OptionAdmin(admin.ModelAdmin):
-    list_display = ['body', 'correct', 'question']
+    list_display = ['id', 'body', 'correct', 'question']
     list_filter = [QuestionOptionsFilter, ]
+    list_display_links = ('body',)
 
 
 class QuizAnswersFilter(admin.SimpleListFilter):
@@ -86,5 +91,6 @@ class QuizAnswersFilter(admin.SimpleListFilter):
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ['quiz', 'question', 'selected']
+    list_display = ['id', 'quiz', 'question', 'selected']
     list_filter = [QuizAnswersFilter, ]
+    list_display_links = ('quiz',)

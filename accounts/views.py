@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.template import loader
 from django.http import HttpResponse
 
@@ -16,8 +16,11 @@ def handle_404(request, exception=None):
 @login_required(login_url='/login')
 def home(request):
     quizzes = Quiz.objects.order_by('-total')[:10]
-
-    return render(request, 'index.html', {'quizzes': quizzes})
+    template = loader.get_template('index.html')
+    context = {
+        'quizzes': quizzes
+    }
+    return HttpResponse(template.render(context, request))
 
 
 def signup(request):
@@ -35,4 +38,9 @@ def signup(request):
             return redirect('home')
     else:
         form = SignUpForm()
-    return render(request, 'accounts/signup.html', {'form': form})
+
+    template = loader.get_template('accounts/signup.html')
+    context = {
+        'form': form
+    }
+    return HttpResponse(template.render(context, request))

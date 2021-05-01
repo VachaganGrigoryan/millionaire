@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% block title %}֊ Արդյունքը{% endblock %}
+
 {% block content %}
     <main class="container">
         <div class="row my-3">
@@ -18,7 +20,7 @@
             {% for answer in quiz.answers.all %}
                 <div class="col-12 col-md-6">
                     <div class="card my-3">
-                        <h5 class="card-header">{{ answer.question.content }}</h5>
+                        <h5 class="card-header">{{ answer.question.content }} <span class="badge rounded-pill bg-primary">{{ answer.question.coin }}</span></h5>
                         <div class="card-body row">
                             {% for option in answer.question.options.all %}
                                 <div class="card-title col-6">

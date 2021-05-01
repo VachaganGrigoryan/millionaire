@@ -1,15 +1,11 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
-from django.shortcuts import get_object_or_404
-from django.template import loader
-from django.db.models import Q
-
-
 from random import sample
 from uuid import uuid4
+
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.template import loader
 
 from quiz.models import Quiz, Question
 
@@ -79,10 +75,7 @@ def answer(request, title):
         questions__options__body=answer
     )
 
-    if quiz.is_answered_question(question_id):
-        quiz_answer = quiz.answers.get(question__id=question_id)
-    else:
-        quiz_answer = quiz.election(question_id, answer)
+    quiz_answer = quiz.election(question_id, answer)
 
     template = loader.get_template('quiz/answer.html')
     context = {
